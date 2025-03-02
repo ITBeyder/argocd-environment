@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: devopsproject
+  namespace: argocd
+spec:
+  # clusterResourceBlacklist:
+  # - group: 'ingressclasses'
+  #   kind: 'IngressClass'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  description: "This is the devops project"
+  destinations:
+  - namespace: '*' ## Use '!' to place namespace in BlackList, if we remove '!' the namespace will be placed in WhiteList
+    server: '*' ## '*' means we are allowed to use any servers
+  sourceRepos:
+  - '*'
+  roles:
+  - name: read-only-user
+    description: "this role can be used for reading and sync applications"
+    policies:
+    - p, proj:project-role:read-only, applications, get, project-role/*, allow
+  - name: admin
+    description: "this role can be used for admin operations"
+    policies:
+    - p, proj:project-role:admin, applications, *, project-role/*, allow
+  - name: sync-user
+    description: "this role can be used for sync applications"
+    policies:
+    - p, proj:project-role:sync-user, applications, sync, project-role/*, allow
+
+# argocd proj role create-token project-role read-sync-user
+# argocd app list --auth-token xxxxx
